@@ -1,14 +1,36 @@
 function love.load()
+    -- level = {
+    --     {' ', ' ', '#', '#', '#'},
+    --     {' ', ' ', '#', '.', '#'},
+    --     {' ', ' ', '#', ' ', '#', '#', '#', '#'},
+    --     {'#', '#', '#', '$', ' ', '$', '.', '#'},
+    --     {'#', '.', ' ', '$', '@', '#', '#', '#'},
+    --     {'#', '#', '#', '#', '$', '#'},
+    --     {' ', ' ', ' ', '#', '.', '#'},
+    --     {' ', ' ', ' ', '#', '#', '#'},
+    -- }
+
     level = {
-        {' ', ' ', '#', '#', '#'},
-        {' ', ' ', '#', '.', '#'},
-        {' ', ' ', '#', ' ', '#', '#', '#', '#'},
-        {'#', '#', '#', '$', ' ', '$', '.', '#'},
-        {'#', '.', ' ', '$', '@', '#', '#', '#'},
-        {'#', '#', '#', '#', '$', '#'},
-        {' ', ' ', ' ', '#', '.', '#'},
-        {' ', ' ', ' ', '#', '#', '#'},
+        {'#', '#', '#', '#', '#'},
+        {'#', '@', ' ', '.', '#'},
+        {'#', ' ', '$', ' ', '#'},
+        {'#', '.', '$', ' ', '#'},
+        {'#', ' ', '$', '.', '#'},
+        {'#', '.', '$', '.', '#'},
+        {'#', '.', '*', ' ', '#'},
+        {'#', ' ', '*', '.', '#'},
+        {'#', ' ', '*', ' ', '#'},
+        {'#', '.', '*', '.', '#'},
+        {'#', '#', '#', '#', '#'},
     }
+
+    player = '@'
+    playerOnStorage = '+'
+    box = '$'
+    boxOnStorage = '*'
+    storage = '.'
+    wall = '#'
+    empty = ' '
 
     love.graphics.setBackgroundColor(255, 255, 215)
 end
@@ -20,12 +42,12 @@ function love.draw()
                 local cellSize = 70
 
                 local colours = {
-                    ['@'] = { 159, 127, 255 },
-                    ['+'] = { 159, 127, 255 },
-                    ['$'] = { 255, 125, 127 },
-                    ['*'] = { 159, 255, 127 },
-                    ['.'] = { 159, 215, 255 },
-                    ['#'] = { 255, 127, 215},
+                    [player] = { 159, 127, 255 },
+                    [playerOnStorage] = { 159, 127, 255 },
+                    [box] = { 255, 125, 127 },
+                    [boxOnStorage] = { 159, 255, 127 },
+                    [storage] = { 159, 215, 255 },
+                    [wall] = { 255, 127, 215},
                 }
 
                 love.graphics.setColor(colours[cell])
@@ -44,5 +66,58 @@ function love.draw()
                 )
             end
         end
+    end
+end
+
+function love.keypressed(key)
+    if key == "up" or key == "down" or key == "left" or key == "right" then
+        local playerX
+        local playerY
+        for testY, row in ipairs(level) do
+            for testX, cell in ipairs(row) do
+                if cell == player or cell == playerOnStorage then
+                    playerX = testX
+                    playerY = testY
+                end
+            end
+        end
+        
+        local dx = 0
+        local dy = 0
+        if key == 'left' then
+            dx = -1
+        elseif key == 'right' then
+            dx = 1
+        elseif key == 'up' then
+            dy = -1
+        elseif key == 'down' then
+            dy = 1
+        end
+
+        local current = level[playerY][playerX]
+        local adjacent = level[playerY + dy][playerX + dx]
+
+        local nextAdjacent = {
+            [empty] = player,
+            [storage] = playerOnStorage,
+        }
+
+        if nextAdjacent[adjacent] then
+            if current == player then
+                level[playerY][playerX] = empty
+                level[playerY + dy][playerX + dx] = nextAdjacent[adjacent]
+            elseif current == playerOnStorage then
+                level[playerY][playerX] = storage
+                level[playerY + dy][playerX + dx] = nextAdjacent[adjacent]
+            end
+        end
+
+
+        print('current = level['..playerY..']['..playerX..'] ('..current..')')
+        print('adjacent = level['..playerY + dy..']['..playerX + dx..'] ('..adjacent..')')
+        print()
+    end
+    if key == "escape" then
+        love.event.quit()
     end
 end
