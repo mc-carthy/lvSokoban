@@ -120,9 +120,13 @@ function love.keypressed(key)
         if nextAdjacent[adjacent] then
             level[playerY][playerX] = nextCurrent[current]
             level[playerY + dy][playerX + dx] = nextAdjacent[adjacent]
-        elseif adjacent == box and nextBeyond[beyond] then
+        elseif nextBeyond[beyond] then
             level[playerY][playerX] = nextCurrent[current]
-            level[playerY + dy][playerX + dx] = player
+            if adjacent == box then
+                level[playerY + dy][playerX + dx] = player
+            elseif adjacent == boxOnStorage then
+                level[playerY + dy][playerX + dx] = playerOnStorage
+            end
             level[playerY + dy + dy][playerX + dx + dx] = nextBeyond[beyond]
         end
 
