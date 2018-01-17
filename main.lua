@@ -41,13 +41,17 @@ function love.load()
     wall = '#'
     empty = ' '
 
-    level = {}
-    for y, row in ipairs(levels[currentLevel]) do
-        level[y] = {}
-        for x, cell in ipairs(row) do
-            level[y][x] = cell
+    function loadLevel()
+        level = {}
+        for y, row in ipairs(levels[currentLevel]) do
+            level[y] = {}
+            for x, cell in ipairs(row) do
+                level[y][x] = cell
+            end
         end
     end
+
+    loadLevel()
 
     love.graphics.setBackgroundColor(255, 255, 215)
 end
@@ -148,11 +152,46 @@ function love.keypressed(key)
             level[playerY + dy + dy][playerX + dx + dx] = nextBeyond[beyond]
         end
 
+        local complete = true
+
+        for y, row in ipairs(level) do
+            for x, cell in ipairs(row) do
+                if cell == box then
+                    complete = false
+                end
+            end
+        end
+
+        if complete then
+            currentLevel = currentLevel + 1
+            if currentLevel > #levels then
+                currentLevel = 1
+            end
+            loadLevel()
+        end
+
 
         print('current = level['..playerY..']['..playerX..'] ('..current..')')
         print('adjacent = level['..playerY + dy..']['..playerX + dx..'] ('..adjacent..')')
         print()
     end
+    
+    if key == 'r' then
+        loadLevel()
+    elseif key == 'n' then
+        currentLevel = currentLevel + 1
+        if currentLevel > #levels then
+            currentLevel = 1
+        end
+        loadLevel()
+    elseif key == 'p' then
+        currentLevel = currentLevel - 1
+        if currentLevel < 1 then
+            currentLevel = #levels
+        end
+        loadLevel()
+    end
+
     if key == "escape" then
         love.event.quit()
     end
