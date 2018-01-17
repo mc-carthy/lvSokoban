@@ -117,16 +117,17 @@ function love.keypressed(key)
             [storage] = boxOnStorage,
         }
 
+        local nextAdjacentPush = {
+            [box] = player,
+            [boxOnStorage] = playerOnStorage,
+        }
+
         if nextAdjacent[adjacent] then
             level[playerY][playerX] = nextCurrent[current]
             level[playerY + dy][playerX + dx] = nextAdjacent[adjacent]
-        elseif nextBeyond[beyond] then
+        elseif nextBeyond[beyond] and nextAdjacentPush[adjacent] then
             level[playerY][playerX] = nextCurrent[current]
-            if adjacent == box then
-                level[playerY + dy][playerX + dx] = player
-            elseif adjacent == boxOnStorage then
-                level[playerY + dy][playerX + dx] = playerOnStorage
-            end
+            level[playerY + dy][playerX + dx] = nextAdjacentPush[adjacent]
             level[playerY + dy + dy][playerX + dx + dx] = nextBeyond[beyond]
         end
 
